@@ -1,0 +1,82 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <!-- Versión del modelo de datos del proyecto Maven -->
+  <modelVersion>4.0.0</modelVersion>
+  <!-- Identificador único del proyecto -->
+  <groupId>org.example</groupId>
+  <!-- Nombre del artefacto generado -->
+  <artifactId>todo</artifactId>
+  <!-- Empaquetado del artefacto generado (war para aplicaciones web) -->
+  <packaging>war</packaging>
+  <!-- Versión del proyecto -->
+  <version>1.0-SNAPSHOT</version>
+  <!-- Nombre del proyecto -->
+  <name>Todo Maven Webapp</name>
+  <!-- URL del proyecto -->
+  <url>http://maven.apache.org</url>
+  <!-- Dependencias del proyecto -->
+  <dependencies>
+    <!-- Dependencia para pruebas unitarias con JUnit -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Conector JDBC para MySQL -->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>8.3.0</version>
+    </dependency>
+    <!-- Dependencias para JavaServer Pages (JSP) -->
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>5.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet.jsp</groupId>
+      <artifactId>jakarta.servlet.jsp-api</artifactId>
+      <version>4.0.0-M2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet.jsp.jstl</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.web</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+      <version>3.0.1</version>
+    </dependency>
+  </dependencies>
+  <!-- Configuración del proceso de construcción del proyecto -->
+  <build>
+    <!-- Nombre final del artefacto generado -->
+    <finalName>todo</finalName>
+    <!-- Plugins utilizados en el proceso de construcción -->
+    <plugins>
+      <!-- Plugin para empaquetar el proyecto como un archivo WAR -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.4.0</version>
+      </plugin>
+      <!-- Plugin para compilar el código fuente del proyecto -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <!-- Configuración del plugin -->
+        <configuration>
+          <!-- Versión de Java utilizada para compilar -->
+          <source>8</source>
+          <target>8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
