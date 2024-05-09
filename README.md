@@ -1,3 +1,9 @@
+!!!!IMPORTANT!!!! 
+Updates to be added in the future: 
+
+*Fix the session ID 
+*Add User Name to each task
+
 Todo Project
 
 This is a Java project based on Maven that provides a web application (WAR) for managing a todo-list of tasks.
