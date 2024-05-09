@@ -1,13 +1,13 @@
-package com.example.WEB;
+package com.example.CONTROLLER;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.example.DAO.TodoDAO;
-import com.example.DAO.TodoDAOImpl;
-import com.example.MODEL.Todo;
+import com.example.DAO.TaskInterface;
+import com.example.DAO.TaskDAO;
+import com.example.MODEL.Task;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,22 +16,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/")
-public class TodoController extends HttpServlet {
+public class TaskController extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private TodoDAO todoDAO;
+    private TaskInterface taskInterface;
 
-    // Método init() para inicializar el TodoDAO
     public void init() {
-        todoDAO = new TodoDAOImpl();
+        taskInterface = new TaskDAO();
     }
 
-    // Método doPost() para manejar las solicitudes POST
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
     }
 
-    // Método doGet() para manejar las solicitudes GET
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getServletPath();
@@ -42,22 +39,21 @@ public class TodoController extends HttpServlet {
                     showNewForm(request, response);
                     break;
                 case "/insert":
-                    insertTodo(request, response);
+                    insertTask(request, response);
                     break;
                 case "/delete":
-                    deleteTodo(request, response);
+                    deleteTask(request, response);
                     break;
                 case "/edit":
                     showEditForm(request, response);
                     break;
                 case "/update":
-                    updateTodo(request, response);
+                    updateTask(request, response);
                     break;
                 case "/list":
-                    listTodo(request, response);
+                    listTask(request, response);
                     break;
                 default:
-                    // Si no se proporciona una acción válida, redirige al usuario a la página de inicio de sesión
                     RequestDispatcher dispatcher = request.getRequestDispatcher("login/login.jsp");
                     dispatcher.forward(request, response);
                     break;
@@ -67,60 +63,54 @@ public class TodoController extends HttpServlet {
         }
     }
 
-    // Método para mostrar el formulario para agregar una nueva tarea
     private void showNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("todo/todo-form.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("task/task-form.jsp");
         dispatcher.forward(request, response);
     }
 
-    // Método para mostrar el formulario para editar una tarea existente
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        Todo existingTodo = todoDAO.selectTodo(id);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("todo/todo-form.jsp");
-        request.setAttribute("todo", existingTodo);
+        Task existingTask = taskInterface.selectTask(id);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("task/task-form.jsp");
+        request.setAttribute("todo", existingTask);
         dispatcher.forward(request, response);
     }
 
-    // Método para insertar una nueva tarea en la base de datos
-    private void insertTodo(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+    private void insertTask(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         String title = request.getParameter("title");
         String username = request.getParameter("username");
         String description = request.getParameter("description");
         boolean isDone = Boolean.parseBoolean(request.getParameter("isDone"));
-        Todo newTodo = new Todo(title, username, description, LocalDate.now(), isDone);
-        todoDAO.insertTodo(newTodo);
+        Task newTask = new Task(title, username, description, LocalDate.now(), isDone);
+        taskInterface.insertTask(newTask);
         response.sendRedirect("list");
     }
 
-    // Método para actualizar una tarea existente en la base de datos
-    private void updateTodo(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+    private void updateTask(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         String title = request.getParameter("title");
         String username = request.getParameter("username");
         String description = request.getParameter("description");
         LocalDate targetDate = LocalDate.parse(request.getParameter("targetDate"));
         boolean isDone = Boolean.parseBoolean(request.getParameter("isDone"));
-        Todo updateTodo = new Todo(id, title, username, description, targetDate, isDone);
-        todoDAO.updateTodo(updateTodo);
+        Task updateTask = new Task(id, title, username, description, targetDate, isDone);
+        taskInterface.updateTask(updateTask);
         response.sendRedirect("list");
     }
 
-    // Método para eliminar una tarea de la base de datos
-    private void deleteTodo(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+    private void deleteTask(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        todoDAO.deleteTodo(id);
+        taskInterface.deleteTask(id);
         response.sendRedirect("list");
     }
 
-    // Método para listar todas las tareas
-    private void listTodo(HttpServletRequest request, HttpServletResponse response)
+    private void listTask(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
-        List < Todo > listTodo = todoDAO.selectAllTodos();
-        request.setAttribute("listTodo", listTodo);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("todo/todo-list.jsp");
+        List<Task> listTask = taskInterface.selectAllTasks();
+        request.setAttribute("listTodo", listTask);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("task/task-list.jsp");
         dispatcher.forward(request, response);
     }
 }

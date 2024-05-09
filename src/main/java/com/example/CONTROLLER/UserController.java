@@ -1,4 +1,4 @@
-package com.example.WEB;
+package com.example.CONTROLLER;
 
 import java.io.IOException;
 
@@ -17,24 +17,18 @@ public class UserController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UserDAO userDao;
 
-    // Método init() para inicializar el UserDAO
     public void init() {
         userDao = new UserDAO();
     }
 
-    // Método doPost() para manejar las solicitudes POST
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         register(request, response);
     }
 
-    // Método doGet() para manejar las solicitudes GET
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.sendRedirect("register/register.jsp");
     }
 
-    // Método para registrar un nuevo usuario
     private void register(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String firstName = request.getParameter("firstName");
         String lastName = request.getParameter("lastName");
@@ -52,16 +46,12 @@ public class UserController extends HttpServlet {
         try {
             int result = userDao.registerEmployee(employee);
             if (result == 1) {
-                // Si el usuario se registra con éxito, se establece una notificación
                 request.setAttribute("NOTIFICATION", "¡Usuario registrado correctamente!");
             }
 
         } catch (Exception e) {
-            // Si ocurre un error, se imprime la traza del error
             e.printStackTrace();
         }
-
-        // Se reenvía la solicitud y la respuesta al formulario de registro
         RequestDispatcher dispatcher = request.getRequestDispatcher("register/register.jsp");
         dispatcher.forward(request, response);
     }

@@ -1,6 +1,6 @@
 package com.example.DAO;
 
-import com.example.MODEL.Todo;
+import com.example.MODEL.Task;
 import com.example.UTILS.JDBCUtil;
 
 import java.sql.Connection;
@@ -11,29 +11,27 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TodoDAOImpl implements TodoDAO {
+public class TaskDAO implements TaskInterface {
 
-    // Consultas SQL preparadas
-    private static final String INSERT_TODOS_SQL = "INSERT INTO todos" +
-            "  (title, username, description, target_date,  is_done) VALUES " + " (?, ?, ?, ?, ?);";
+    // Consultas SQL preparadas //PreparedStatements
+    private static final String INSERT_TODOS_SQL = "INSERT INTO todos" + "  (title, username, description, target_date,  is_done) VALUES " + " (?, ?, ?, ?, ?);";
     private static final String SELECT_TODO_BY_ID = "select id,title,username,description,target_date,is_done from todos where id =?";
     private static final String SELECT_ALL_TODOS = "select * from todos";
     private static final String DELETE_TODO_BY_ID = "delete from todos where id = ?;";
     private static final String UPDATE_TODO = "update todos set title = ?, username= ?, description =?, target_date =?, is_done = ? where id = ?;";
 
-    public TodoDAOImpl() {}
+    public TaskDAO() {}
 
-    // Método para insertar un nuevo Todo en la base de datos
     @Override
-    public void insertTodo(Todo todo) throws SQLException {
+    public void insertTask(Task task) throws SQLException {
         System.out.println(INSERT_TODOS_SQL);
         // try-with-resource statement will auto close the connection.
         try (Connection connection = JDBCUtil.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(INSERT_TODOS_SQL)) {
-            preparedStatement.setString(1, todo.getTitle());
-            preparedStatement.setString(2, todo.getUsername());
-            preparedStatement.setString(3, todo.getDescription());
-            preparedStatement.setDate(4, JDBCUtil.getSQLDate(todo.getTargetDate()));
-            preparedStatement.setBoolean(5, todo.getStatus());
+            preparedStatement.setString(1, task.getTitle());
+            preparedStatement.setString(2, task.getUsername());
+            preparedStatement.setString(3, task.getDescription());
+            preparedStatement.setDate(4, JDBCUtil.getSQLDate(task.getDueDate()));
+            preparedStatement.setBoolean(5, task.getStatus());
             System.out.println(preparedStatement);
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
@@ -41,52 +39,40 @@ public class TodoDAOImpl implements TodoDAO {
         }
     }
 
-    // Método para seleccionar un Todo por su ID
     @Override
-    public Todo selectTodo(long todoId) {
-        Todo todo = null;
-        // Paso 1: Establecer una conexión
+    public Task selectTask(long todoId) {
+        Task task = null;
         try (Connection connection = JDBCUtil.getConnection();
-             // Paso 2: Crear una declaración utilizando el objeto de conexión
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_TODO_BY_ID)) {
             preparedStatement.setLong(1, todoId);
             System.out.println(preparedStatement);
-            // Paso 3: Ejecutar la consulta o la actualización de la consulta
             ResultSet rs = preparedStatement.executeQuery();
 
-            // Paso 4: Procesar el objeto ResultSet
             while (rs.next()) {
                 long id = rs.getLong("id");
                 String title = rs.getString("title");
                 String username = rs.getString("username");
                 String description = rs.getString("description");
-                LocalDate targetDate = rs.getDate("target_date").toLocalDate();
+                LocalDate dueDate = rs.getDate("target_date").toLocalDate();
                 boolean isDone = rs.getBoolean("is_done");
-                todo = new Todo(id, title, username, description, targetDate, isDone);
+                task = new Task(id, title, username, description, dueDate, isDone);
             }
         } catch (SQLException exception) {
             JDBCUtil.printSQLException(exception);
         }
-        return todo;
+        return task;
     }
 
-    // Método para seleccionar todos los Todos de la base de datos
     @Override
-    public List < Todo > selectAllTodos() {
+    public List <Task> selectAllTasks() {
+        List <Task> tasks = new ArrayList < > ();
 
-        // usando try-with-resources para evitar el cierre de recursos (código boilerplate)
-        List < Todo > todos = new ArrayList < > ();
-
-        // Paso 1: Establecer una conexión
         try (Connection connection = JDBCUtil.getConnection();
 
-             // Paso 2: Crear una declaración utilizando el objeto de conexión
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_TODOS)) {
             System.out.println(preparedStatement);
-            // Paso 3: Ejecutar la consulta o la actualización de la consulta
             ResultSet rs = preparedStatement.executeQuery();
 
-            // Paso 4: Procesar el objeto ResultSet
             while (rs.next()) {
                 long id = rs.getLong("id");
                 String title = rs.getString("title");
@@ -94,17 +80,16 @@ public class TodoDAOImpl implements TodoDAO {
                 String description = rs.getString("description");
                 LocalDate targetDate = rs.getDate("target_date").toLocalDate();
                 boolean isDone = rs.getBoolean("is_done");
-                todos.add(new Todo(id, title, username, description, targetDate, isDone));
+                tasks.add(new Task(id, title, username, description, targetDate, isDone));
             }
         } catch (SQLException exception) {
             JDBCUtil.printSQLException(exception);
         }
-        return todos;
+        return tasks;
     }
 
-    // Método para eliminar un Todo de la base de datos por su ID
     @Override
-    public boolean deleteTodo(int id) throws SQLException {
+    public boolean deleteTask(int id) throws SQLException {
         boolean rowDeleted;
         try (Connection connection = JDBCUtil.getConnection(); PreparedStatement statement = connection.prepareStatement(DELETE_TODO_BY_ID)) {
             statement.setInt(1, id);
@@ -113,17 +98,16 @@ public class TodoDAOImpl implements TodoDAO {
         return rowDeleted;
     }
 
-    // Método para actualizar un Todo en la base de datos
     @Override
-    public boolean updateTodo(Todo todo) throws SQLException {
+    public boolean updateTask(Task task) throws SQLException {
         boolean rowUpdated;
         try (Connection connection = JDBCUtil.getConnection(); PreparedStatement statement = connection.prepareStatement(UPDATE_TODO)) {
-            statement.setString(1, todo.getTitle());
-            statement.setString(2, todo.getUsername());
-            statement.setString(3, todo.getDescription());
-            statement.setDate(4, JDBCUtil.getSQLDate(todo.getTargetDate()));
-            statement.setBoolean(5, todo.getStatus());
-            statement.setLong(6, todo.getId());
+            statement.setString(1, task.getTitle());
+            statement.setString(2, task.getUsername());
+            statement.setString(3, task.getDescription());
+            statement.setDate(4, JDBCUtil.getSQLDate(task.getDueDate()));
+            statement.setBoolean(5, task.getStatus());
+            statement.setLong(6, task.getId());
             rowUpdated = statement.executeUpdate() > 0;
         }
         return rowUpdated;
